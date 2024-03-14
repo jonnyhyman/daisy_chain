@@ -15,6 +15,7 @@ resolve
  *   
  *  -> {
  *      'type': 'ProjectManager',
+ *      'uuid': '...-...-...-...'
  *  }
  *  ... then ...
  *
@@ -24,7 +25,7 @@ resolve
  *   
  *  -> {
  *      'type': 'Project',
- *      'name': 'Captains Log'
+ *      'uuid': '...-...-...-...'
  *  }
  *  ... then ...
  *
@@ -34,6 +35,7 @@ resolve
  *
  *  -> {
  *      'type': 'MediaPool',
+ *      'uuid': '...-...-...-...'
  *  }
  *  ... then ...
  *

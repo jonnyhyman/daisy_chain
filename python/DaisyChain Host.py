@@ -140,12 +140,12 @@ def serialize(obj: Union[API_Value, API_Object, API_Roots], error: Optional[str]
 
             # improve on this a bit if the repr includes a uuid
             # (this looks for a uuid-hexadecimal block in the repr)
-            uuid = re.findall(r"\b[0-9a-f]+(?:-[0-9a-f]+)+\b", key_obj)
+            uuid = re.findall(r"\b[0-9a-f]+(?:-[0-9a-f]+)+\b", key_obj)[0]
 
             if len(uuid):
                 key_obj = uuid[0]
 
-            jsn_obj = {'API_Object': {'uuid': key_obj, 'type': typ_obj}}
+            jsn_obj = {'API_Object': {'type': typ_obj, 'uuid': key_obj}}
 
             # retain reference to obj
             API_Objects[key_obj] = obj
