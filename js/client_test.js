@@ -2,7 +2,9 @@ const net = require('net');
 const client = new net.Socket();
 
 cmd = {
-    'fn': 'resolve.get_version_string',
+    // 'fn': 'resolve.get_version_string',
+    // 'fn': 'resolve.get_project_manager',
+    'fn': 'resolve.get_current_project',
     'args': [],
     'kwargs': {},
 }

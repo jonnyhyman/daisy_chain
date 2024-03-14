@@ -248,6 +248,14 @@ class TimelineItem(object):
     def FinalizeTake(self) -> bool: return bool()
     def CopyGrades(self, items: List["TimelineItem"]) -> bool: return bool()
 
+class Timer:
+
+    def Start(self):
+        pass
+
+    def Stop(self):
+        pass
+
 class UIManager:
     """ TODO: Fill with functions and types of UI Manager """
     
@@ -260,8 +268,8 @@ class UIManager:
     def Font(*args, **kwargs):
         pass
 
-    def Timer(*args, **kwargs):
-        pass
+    def Timer(*args, **kwargs)->Timer:
+        return Timer()
 
 class Fusion:
     """ Fusion API functions and types """

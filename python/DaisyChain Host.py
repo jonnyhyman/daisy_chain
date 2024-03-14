@@ -6,6 +6,7 @@ import os
 import socket
 import select
 import json
+import re
 
 from typing import Union, Tuple, Optional, TYPE_CHECKING
 
@@ -83,31 +84,94 @@ def log_to_file(log_string:str):
         log_file.write(log_string)
         log_file.write('\n')
 
+class API_Object:
+
+    def GetUniqueId(self)->str:
+        return str()
 
 API_Value = Union[str, int, float, bool, list, dict, None]
+API_Roots = Union[Resolve, Fusion] 
+
+API_ObjType = Union[API_Object, API_Roots]
+API_Objects: dict[str, API_ObjType] = {} 
+
+
+'''
+--- TODO ---
+Replace the function maps below with 
+a way to lookup the API_Objects and
+then to go into them for additional
+function calls in the API, ex:
+```js
+
+resolve
+    .get_project_manager()
+    .get_current_project()
+    .get_media_pool()
+    .import_media(['./wow.mp4', './pie.jpg']);
+
+```
+'''
 
 resolve_fn = {
     # "client_function_name": (resolve function object)
     "resolve.get_version_string": resolve.GetVersionString,
+    "resolve.get_project_manager": resolve.GetProjectManager,
+    "resolve.get_current_project": resolve.GetProjectManager().GetCurrentProject,
     # resolve.GetProjectManager().GetCurrentProject().GetMediaPool().ImportMedia
 }
 
-def serialize(obj: object, error: Optional[str]=None):
+def serialize(obj: Union[API_Value, API_Object, API_Roots], error: Optional[str]=None):
+    global API_Objects
 
     if error is not None:
         print(f"❌ Execution error > {error}")
 
+    if isinstance(obj, API_Value):
+        jsn_obj = str(obj)
+        print(f'> Stringified {jsn_obj}')
+
+    else:
+        
+        try:
+            # key by repr
+            key_obj = str(obj)
+            typ_obj = re.findall(r'^\w+', str(obj))[0]
+
+            # improve on this a bit if the repr includes a uuid
+            # (this looks for a uuid-hexadecimal block in the repr)
+            uuid = re.findall(r"\b[0-9a-f]+(?:-[0-9a-f]+)+\b", key_obj)
+
+            if len(uuid):
+                key_obj = uuid[0]
+
+            jsn_obj = {'API_Object': {'uuid': key_obj, 'type': typ_obj}}
+
+            # retain reference to obj
+            API_Objects[key_obj] = obj
+            print(f'> Added {typ_obj} to API_Objects')
+
+        except TypeError:
+            jsn_obj = None
+            error = f"TypeError: {obj} cannot be serialized"
+
     return json.dumps({
-            "value": str(obj),
+            "value": jsn_obj,
             "error": error,
             })
 
 def deserialize(desc: dict):
     ''' 
-        Get the object described by `desc` from
-        searching throughout the Resolve API
+        Get the object described by `desc`
+        by retrieving it from the hash map
+
     '''
-    print('... Look for', desc)
+    global API_Objects
+    return API_Objects[ desc['uuid'] ]
+
+# prepare API_Objects by serializing the root objects 
+serialize(resolve)
+serialize(fusion)
 
 def execute_remote_command(raw_cmd:bytes) -> str:
     ''' Validate and execute the remote command call
