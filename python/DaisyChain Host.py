@@ -7,6 +7,7 @@ import socket
 import select
 import json
 import re
+import hashlib
 
 from typing import Union, Tuple, Optional, TYPE_CHECKING
 
@@ -58,7 +59,7 @@ else:
 
 HOST = '127.0.0.1'  # Standard loopback interface address (localhost)
 PORT = 65432        # Port to listen on (non-privileged ports are > 1023)
-RATE = 500          # Milliseconds per update 
+RATE = 50           # Milliseconds per update 
 
 def script_init() -> Tuple[BMD, Resolve, Fusion]:
 
@@ -66,7 +67,8 @@ def script_init() -> Tuple[BMD, Resolve, Fusion]:
         # code is unreachable by LSP here
         # not a problem because these variables
         # are injected by Resolve at runtime
-        return bmd, resolve, fusion  # type: ignore
+        return bmd, resolve, fusion # type: ignore
+
     else:
         return BMD(), Resolve(), Fusion()
 
@@ -93,33 +95,9 @@ API_Value = Union[str, int, float, bool, list, dict, None]
 API_Roots = Union[Resolve, Fusion] 
 
 API_ObjType = Union[API_Object, API_Roots]
+# this is an ongoing cache which can be 
+# reset by clicking the clear cache btn
 API_Objects: dict[str, API_ObjType] = {} 
-
-
-'''
---- TODO ---
-Replace the function maps below with 
-a way to lookup the API_Objects and
-then to go into them for additional
-function calls in the API, ex:
-```js
-
-resolve
-    .get_project_manager()
-    .get_current_project()
-    .get_media_pool()
-    .import_media(['./wow.mp4', './pie.jpg']);
-
-```
-'''
-
-resolve_fn = {
-    # "client_function_name": (resolve function object)
-    "resolve.get_version_string": resolve.GetVersionString,
-    "resolve.get_project_manager": resolve.GetProjectManager,
-    "resolve.get_current_project": resolve.GetProjectManager().GetCurrentProject,
-    # resolve.GetProjectManager().GetCurrentProject().GetMediaPool().ImportMedia
-}
 
 def serialize(obj: Union[API_Value, API_Object, API_Roots], error: Optional[str]=None):
     global API_Objects
@@ -127,33 +105,37 @@ def serialize(obj: Union[API_Value, API_Object, API_Roots], error: Optional[str]
     if error is not None:
         print(f"❌ Execution error > {error}")
 
-    if isinstance(obj, API_Value):
-        jsn_obj = str(obj)
-        print(f'> Stringified {jsn_obj}')
+    if isinstance(obj, list):
+        # recurse through args to ensure they
+        # are serialized if API_Objects
+        obj = [json.loads(serialize(elem))['value'] for elem in obj ]
 
-    else:
-        
+    if isinstance(obj, dict):
+        # recurse through args to ensure they
+        # are serialized if API_Objects
+        obj = {k: json.loads(serialize(v))['value'] for k,v in obj.items() } 
+
+    if not isinstance(obj, API_Value):
+        # obj is an api object!
         try:
             # key by repr
             key_obj = str(obj)
             typ_obj = re.findall(r'^\w+', str(obj))[0]
 
-            # improve on this a bit if the repr includes a uuid
-            # (this looks for a uuid-hexadecimal block in the repr)
-            uuid = re.findall(r"\b[0-9a-f]+(?:-[0-9a-f]+)+\b", key_obj)[0]
-
-            if len(uuid):
-                key_obj = uuid[0]
-
+            # generate a unique id for the key obj
+            key_obj = hashlib.sha256(key_obj.encode()).hexdigest()
             jsn_obj = {'API_Object': {'type': typ_obj, 'uuid': key_obj}}
 
             # retain reference to obj
             API_Objects[key_obj] = obj
-            print(f'> Added {typ_obj} to API_Objects')
+            print(f'👍 Added {typ_obj} to API_Objects')
 
         except TypeError:
             jsn_obj = None
             error = f"TypeError: {obj} cannot be serialized"
+
+    else:
+        jsn_obj = obj
 
     return json.dumps({
             "value": jsn_obj,
@@ -167,24 +149,51 @@ def deserialize(desc: dict):
 
     '''
     global API_Objects
-    return API_Objects[ desc['uuid'] ]
 
-# prepare API_Objects by serializing the root objects 
-serialize(resolve)
-serialize(fusion)
+    if desc['uuid'] in API_Objects.keys():
+        return API_Objects[ desc['uuid'] ]
+    else:
+        return None
+
+def reset_cache():
+    '''
+        Clear the API_Objects cache
+    '''
+    global API_Objects
+    API_Objects = {}
 
 def execute_remote_command(raw_cmd:bytes) -> str:
     ''' Validate and execute the remote command call
         from its json encoded in utf-8 bytes over TCP.
 
         Schema must exactly match:
-        - fn: str # the function name to be called
-        - args: list[API_Value] # the values of the func args
-        - kwargs: dict[str, API_Value] # the values of the func kwargs
+        - root: dict - object lookup {'API_Object': {'type':str, 'uuid':str}}
+        - impl: str  - the name of the type's impl to be called
+        - args: list[API_Value] - the values of the func args
+        - kwgs: dict[str, API_Value] - the values of the func kwgs
+
+        Example 1: Get version string
+        ```
+        {
+            'root': {'API_Object':{'type':"Resolve", 'uuid':"..."}},
+            'impl': 'GetVersionString'
+            'args': [],
+            'kwgs': {},
+        }
+        ```
+        Example 1: Import into media pool
+        ```
+        {
+            'root': {'API_Object':{'type':"MediaPool", 'uuid':"..."}},
+            'impl': 'ImportMedia'
+            'args': ['./wow.mp4', './pie.jpg'],
+            'kwgs': {},
+        }
+        ```
 
         where API_Value: str | int | float | bool | list | dict
 
-        if the API_Value is a dict and its only key is "API_Object",
+        if the API_Value is a dict and it has key "API_Object",
             then we will reconstruct a python object with its
             keys as attributes of the object, an exact mirror
             of the object which exists in the Resolve API
@@ -198,10 +207,16 @@ def execute_remote_command(raw_cmd:bytes) -> str:
     cmd: dict = json.loads(raw_cmd.decode())
 
     # validate the command schema and types
+    # (basics)
     try:
-        assert(('fn' in cmd.keys()) and (cmd['fn'] in resolve_fn.keys()))
+        assert('root' in cmd.keys() and isinstance(cmd['root'], dict))
     except AssertionError:
-        return serialize(None, error=f'TypeError: invalid command function: {cmd}')
+        return serialize(None, error=f'TypeError: invalid command type: {cmd}')
+
+    try:
+        assert('impl' in cmd.keys() and isinstance(cmd['impl'], str))
+    except AssertionError:
+        return serialize(None, error=f'TypeError: invalid command type: {cmd}')
 
     try:
         assert(('args' in cmd.keys()) and isinstance(cmd['args'], list))
@@ -209,21 +224,44 @@ def execute_remote_command(raw_cmd:bytes) -> str:
         return serialize(None, error=f'TypeError: invalid command args: {cmd}')
     
     try:
-        assert(('kwargs' in cmd.keys()) and isinstance(cmd['kwargs'], dict))
+        assert(('kwgs' in cmd.keys()) and isinstance(cmd['kwgs'], dict))
     except AssertionError:
-        return serialize(None, error=f'TypeError: invalid command kwargs: {cmd}')
+        return serialize(None, error=f'TypeError: invalid command kwgs: {cmd}')
+
+    # detect if this is an initialization requst (`daisychain_init`)
+    # in which case we simply return the root ref resolve
+    if cmd['impl'] == 'daisychain_init':
+        print('🌼 Initializing:', cmd)
+        return serialize(resolve)
+
+    # validate that the type exists and the impl exists for that type
+    src_desc = cmd['root']['API_Object']
+    src_root = deserialize(src_desc)
+    src_call = getattr(src_root, cmd['impl'])
+    # ^ Resolve API things that every object has every attribute,
+    # but if it actually does not, src_call will be None, not a function
+
+    # TODO: validate that the resulting type is equivalent
+
+    if src_call is None:
+        return serialize(None, 
+                    error=f'AttributeError: {src_root} has no impl {cmd["impl"]}')
+
+
+    # TODO: validate input argument types 
     
-    # deserialize any args or kwargs which are API_Objects
+    # deserialize any args or kwgs which are API_Objects
     for a, value in enumerate(cmd['args']):
         cmd['args'][a] = deserialize(value['API_Object']) if "API_Object" in value else value
 
-    for n, value in cmd['kwargs']:
-        cmd['kwargs'][n] = deserialize(value['API_Object']) if "API_Object" in value else value
+    for n, value in cmd['kwgs']:
+        cmd['kwgs'][n] = deserialize(value['API_Object']) if "API_Object" in value else value
 
     # execute command in resolve API, retreive its values
     print('🌼 Running:', cmd)
-
-    output = resolve_fn[cmd['fn']]( *cmd['args'], **cmd['kwargs'] )
+    
+    # deserialize {'API_Object':...} to the actual reference or just 'resolve'
+    output = src_call( *cmd['args'], **cmd['kwgs'] )
     output = serialize(output)
 
     print('🌼 Returning:', output)
@@ -233,6 +271,10 @@ def execute_remote_command(raw_cmd:bytes) -> str:
 
 try:
     
+    # fill the objects cache with just resolve and fusion
+    reset_cache()
+
+    # build the tiny ui
     ui = fusion.UIManager # type: ignore
     dispatcher = bmd.UIDispatcher(ui) # type: ignore
 
@@ -240,8 +282,12 @@ try:
             ui.Label({ 
                 'ID'  : "status_line",
                 'Text': "🌼 DaisyChain starting...",
-                'Weight': 0.1,
-                'Font': ui.Font({ 'Family': "Helvetica" }) 
+                # 'Weight': 0.1,
+                # 'Font': ui.Font({ 'Family': "Helvetica" }) 
+            }),
+            ui.Button({
+                'ID'  : "reset_btn",
+                'Text': "Reset Cache",
             }),
 
     ])
@@ -253,7 +299,7 @@ try:
     wnd = dispatcher.AddWindow(
             { 
              'ID': wnd_id,
-             'Geometry': [100,100,250,50],
+             'Geometry': [100,100,250,75],
              'WindowTitle': "DaisyChain Host",
              }, 
             layout)
@@ -312,10 +358,11 @@ try:
                 else:
                     message = notified_socket.recv(1024)
 
-                    if message:
+                    if message: 
                         print(f"🌼 Executing remote command: {message}")
                         set_status('executing')
                         reply = execute_remote_command(message)
+                        set_status('responding')
                         notified_socket.send(reply.encode())
                     else:
                         self.sockets.remove(notified_socket)

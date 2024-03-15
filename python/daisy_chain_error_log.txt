@@ -1,0 +1,17 @@
+
+DAISY CHAIN EXCEPTION LOG ---- 2024-03-15 09:18:18.048933
+----
+Traceback (most recent call last):
+  File "/Users/jonnyhyman/Library/Application Support/Blackmagic Design/DaVinci Resolve/Fusion/Scripts/Utility/DaisyChain Host.py", line 411, in <module>
+    except Exception as _:
+  File "<nofile>", line 164, in RunLoop
+TypeError: 'NoneType' object is not callable
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/jonnyhyman/Library/Application Support/Blackmagic Design/DaVinci Resolve/Fusion/Scripts/Utility/DaisyChain Host.py", line 410, in <module>
+  File "/Users/jonnyhyman/Library/Application Support/Blackmagic Design/DaVinci Resolve/Fusion/Scripts/Utility/DaisyChain Host.py", line 402, in __exit__
+    return False
+TypeError: 'NoneType' object is not callable
+
