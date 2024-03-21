@@ -739,7 +739,7 @@ class TimelineItem(API_Object):
     def get_media_pool_item(self) -> Optional["MediaPoolItem"]:
         """Returns the media pool item corresponding to the timeline item if one exists."""
         media_pool_item = self.rpc("GetMediaPoolItem")
-        if media_pool_item:
+        if media_pool_item is not None:
             return MediaPoolItem(media_pool_item)
         else:
             return None

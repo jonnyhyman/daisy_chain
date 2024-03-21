@@ -1,14 +1,23 @@
 # 🌼 DaisyChain
 __Script and workflow manager for DaVinci Resolve__
 
-__Status:__ Experimental alpha ⚠️ (Use caution, most script executions are irreversible!)
 
 ## Goals
 - _Make DaVinci Resolve/Fusion scripting fast, fun, and reliable_
-- _Write scripts with full IDE support and documentation_
+- _Write scripts with full autocompletion, and in-IDE documentation_
 - _Turn your one-off script automations into ongoing organized workflows_
 - _Experiment with Resolve scripts safely, on an unbounded undo tree_
 - _Share your workflows and use those that others have shared_
+
+## Status
+Experimental ⚠️ (Use caution, most script executions are irreversible!)
+
+|Language|Resolve API|Fusion API|Tests|
+|--|--|--|--|
+|Python| ✅ | 🚧 | ❌ |
+|Lua | ❌ | ❌ | ❌ |
+|JS/TS| ❌ | ❌ | ❌ |
+|Rust| ❌ | ❌ | ❌ |
 
 ## Why?
 Blackmagic's API for Resolve and Fusion is extensive and powerful,
@@ -28,14 +37,14 @@ and defining a serialized interface for the entire API surface.
 like an RPC of an RPC. While a little bit ridiculous, this allows us
 to write and use the API in a familiar way with full documentation)
 
-Types and documentation are written in each client language,
-for instance using typehints and docstrings in Python
+Types, documentation, and RPC connection is written in each client language,
+see the status of your favorite language in the Status table above.
 
 ## Script use-cases
 
 - 🚧 A Chromium / WebKit extension to "Download to Media Pool" from internet, called CreditsDue
-- 🚧 A script to copy from a current-timeline-item metadata field to clipboard on a timer
-- 🚧 A more accurate transcription workflow than Resolve's trashy one using Whisper (for subtitles)
+- 🚧 A script to copy from a current-timeline-item metadata field to clipboard on a timer, called CopyCat
+- 🚧 A more accurate transcription workflow than Resolve's trashy one, using OpenAI Whisper
 - 🚧 Removing silence from a clip automatically (via ffmpeg or some loopback)
 - 🚧 `py-auto-gui` madness to automate repetitive edit tasks (macros, basically)
 

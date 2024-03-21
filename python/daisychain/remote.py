@@ -40,7 +40,9 @@ def rpc(root:dict, impl:str, *args, **kwargs) -> Any:
     # raise errors if they occured
     if resp["error"] is not None:
         raise(RPCError(resp['error']))
-    
+
+    # TODO return None if appropriate
+
     # get results
     return resp["value"]
 
