@@ -74,8 +74,7 @@ def script_init() -> Tuple[BMD, Resolve, Fusion]:
 
 bmd, resolve, fusion = script_init()
 
-# log_dir = Path.home()
-log_dir = Path('/Users/jonnyhyman/Dropbox/Compute/daisy_chain/python/')
+log_dir = Path.home()
 
 def log_to_file(log_string:str):
     

@@ -25,23 +25,7 @@ while True:
     timeline = proj.get_current_timeline()
     item_clip = timeline.get_current_video_item()
 
-    '''
-    ISSUE
-
-    the below will fail if item_clip is None...
-
-    Traceback (most recent call last):
-  File "/Users/jonnyhyman/Human Creative Dropbox/Jonny Hyman/Compute/daisy_chain/examples/copycat.py", line 27, in <module>
-    item_in_pool = item_clip.get_media_pool_item()
-  File "/Users/jonnyhyman/Human Creative Dropbox/Jonny Hyman/Compute/daisy_chain/python/daisychain/resolve.py", line 741, in get_media_pool_item
-    media_pool_item = self.rpc("GetMediaPoolItem")
-  File "/Users/jonnyhyman/Human Creative Dropbox/Jonny Hyman/Compute/daisy_chain/python/daisychain/remote.py", line 64, in rpc
-    return rpc(self.root, impl, *args, **kwargs)
-  File "/Users/jonnyhyman/Human Creative Dropbox/Jonny Hyman/Compute/daisy_chain/python/daisychain/remote.py", line 42, in rpc
-    raise(RPCError(resp['error']))
-daisychain.remote.RPCError: TypeError: invalid command type: {'root': None, 'impl': 'GetMediaPoolItem', 'args': [], 'kwgs': {}}
-
-    '''
+    # TODO: error occurs if item_clip is None, see #5
 
     item_in_pool = item_clip.get_media_pool_item()
 
@@ -59,4 +43,3 @@ daisychain.remote.RPCError: TypeError: invalid command type: {'root': None, 'imp
 
     sleep(copy_intvl)
 
-print('Canceled!')
