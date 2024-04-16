@@ -17,7 +17,7 @@ resolve = get_resolve()
 proj = resolve.get_project_manager().get_current_project()
 
 copy_field = "Comments"
-copy_intvl = 1.0
+copy_intvl = 5.0
 
 print("🐈 Copy Cat is watching!")
 

@@ -1,5 +1,8 @@
 setup.py
 daisychain/__init__.py
+daisychain/fusion.py
+daisychain/remote.py
+daisychain/resolve.py
 daisychain.egg-info/PKG-INFO
 daisychain.egg-info/SOURCES.txt
 daisychain.egg-info/dependency_links.txt

@@ -35,7 +35,7 @@ else:
     📁 "~/Library/Application Support/Blackmagic Design/DaVinci Resolve/Fusion/Scripts/Utility"
     
     Windows
-    📁 "%AppData%\\Blackmagic Design\\DaVinci Resolve\\Fusion\\Scripts\\Utility"
+    📁 "%AppData%\\Blackmagic Design\\DaVinci Resolve\\Support\\Fusion\\Scripts\\Utility"
 
     Linux
     📁 "~/.local/share/DaVinciResolve/Fusion/Scripts/Utility"
