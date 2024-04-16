@@ -1,13 +1,15 @@
-from daisychain import resolve
+from daisychain import get_resolve
+
+resolve = get_resolve()
 
 pmgr = resolve.get_project_manager()
-print('pmgr', pmgr)
+print("pmgr", pmgr)
 
 proj = pmgr.get_current_project()
-print('proj', proj)
+print("proj", proj)
 
 name = proj.get_name()
-print('name', name)
+print("name", name)
 
 # project_name = daisychain.get_project_manager().get_project().get_name()
 # print(project_name)
