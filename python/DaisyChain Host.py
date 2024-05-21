@@ -1,3 +1,5 @@
+__version__ = 2460452
+
 from pathlib import Path
 from datetime import datetime
 import traceback
@@ -326,7 +328,7 @@ try:
         {
             "ID": wnd_id,
             "Geometry": [100, 100, 250, 75],
-            "WindowTitle": "DaisyChain Host",
+            "WindowTitle": f"DaisyChain Host v{__version__}",
         },
         layout,
     )
