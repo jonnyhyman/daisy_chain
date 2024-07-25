@@ -1,6 +1,6 @@
 """
 
-    🥡 Collect copies or moves all the source media
+    🥡 "Collect" copies or moves all the source media
         within the current timeline or media pool bin
         into the project folder root, maintaining the
         bin hierarchies defined within the media pool
@@ -12,7 +12,7 @@
 
 import asyncio
 from daisychain import get_resolve
-from daisychain.resolve import MediaPool, MediaPoolFolder, MediaPoolItem, Project
+from daisychain.resolve import MediaPool, MediaPoolFolder, MediaPoolItem
 
 from pathlib import Path
 
@@ -23,9 +23,6 @@ from typing import List, Tuple, Union
 
 # options: ["copy", "move"]
 collect_command = "copy"
-
-# options: ["current_bin", "current_timeline"]
-collect_from = "current_bin"
 
 # collect_into = Path("/Users/jonnyhyman/Movies/DaisyChain Test/")
 collect_into = Path(
@@ -65,27 +62,6 @@ def paths_for_items(items: List[MediaPoolItem]) -> Collection:
             collection[uuid] = (item, path)
 
     return collection
-
-
-def media_in_timeline(proj: Project) -> Collection:
-    """
-    Find the MediaPoolItems in the current timeline
-    and zip them together into:
-        [(item: MediaPoolItem, path: Path)]
-    """
-    print("> Getting media in timeline")
-    tline = proj.get_current_timeline()
-
-    items: List[MediaPoolItem] = []
-    for track_type in ["video", "audio"]:
-        for t in range(1, tline.get_track_count(track_type) + 1):
-            clips = tline.get_item_list_in_track(track_type, t)
-            for clip in clips:
-                item = clip.get_media_pool_item()
-                if item:
-                    items.append(item)
-
-    return paths_for_items(items)
 
 
 def media_in_bin(pool: MediaPool) -> Collection:
@@ -140,7 +116,7 @@ def ensure_disk_space(collection: Collection):
             )
 
 
-def discover_parents(pool: MediaPool, collection: Collection) -> BinsMirror:
+def discover_children(root: MediaPoolFolder, collection: Collection) -> BinsMirror:
     """
     Build a mirror of the media pool including only
     the items we have in the `collection`.
@@ -188,7 +164,7 @@ def discover_parents(pool: MediaPool, collection: Collection) -> BinsMirror:
     foci = tuple(collection.keys())
 
     mirror: BinsMirror = {}
-    crawl(pool.get_root_folder(), (), mirror, foci)
+    crawl(root, (), mirror, foci)
 
     return mirror
 
@@ -253,18 +229,14 @@ async def collect():
     pool = proj.get_media_pool()
 
     # detect collection of media in `collect_from`
-    if collect_from == "current_bin":
-        collection = media_in_bin(pool)
-    elif collect_from == "current_timeline":
-        collection = media_in_timeline(proj)
-    else:
-        raise (ValueError("{collect_from} not a valid option"))
+    collection = media_in_bin(pool)
 
     # get file sizes in collection to ensure free disk space
-    ensure_disk_space(collection)
+    if collect_command == "copy":
+        ensure_disk_space(collection)
 
     # detect media bin & item hierarchies
-    mirror = discover_parents(pool, collection)
+    mirror = discover_children(pool, collection)
 
     # rebuild media bin hierarchy on file system
     newsrc = new_src_dirs(mirror)

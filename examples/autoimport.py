@@ -34,7 +34,8 @@ use_initial_bin = False
 # ^ if False, will always import into current bin, no matter where it is
 watch_dir = Path(
     # "/Users/jonnyhyman/Dropbox/Dr Becky/Night Sky News/April 2024/B-ROLL/SCREEN GRABS/"
-    "C:/Users/jonny/Dropbox/Dr Becky/Night Sky News/April 2024/B-ROLL/SCREEN GRABS/"
+    # "C:/Users/jonny/Dropbox/Dr Becky/Night Sky News/April 2024/B-ROLL/SCREEN GRABS/"
+    "/Users/jonnyhyman/Dropbox/Dr Becky/Night Sky News/May 2024/B-ROLL/screen captures/"
 )
 
 print(f"> Listening for changes in {watch_dir}")
