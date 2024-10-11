@@ -53,6 +53,31 @@ see the status of your favorite language in the Status table above.
 - Later, lazy video editors with coding experience
 - Later, production houses with workflow programmers on staff
 
+## Installation
+
+1. Set Resolve External Scripting to Local or Network
+2. Install Python
+2. Ensure that the PYTHONHOME env variable is set at system level,
+    to point to the directory where you will find the python3.exe,
+    or symlink that path with /usr/local/bin/python3
+2. Copy the DaisyChain Host script into Resolve's watch folder for scripts
+    macOS
+
+    ```
+    cp "./python/DaisyChain Host.py" "/Library/Application Support/Blackmagic Design/DaVinci Resolve/Fusion/Scripts/Utility"
+    ```
+    
+    Windows
+    📁 "%AppData%\\Blackmagic Design\\DaVinci Resolve\\Support\\Fusion\\Scripts\\Utility"
+
+    Linux
+    📁 "~/.local/share/DaVinciResolve/Fusion/Scripts/Utility"
+
+3. Open 
+
+4. Close and open Resolve if it was open
+
+
 ## Roadmap
 
 __Milestone 1__ Python server and client

@@ -1,0 +1,4 @@
+[console_scripts]
+bindive = daisychain.scripts.bindive:main
+collate = daisychain.scripts.collate:main
+copycat = daisychain.scripts.copycat:main

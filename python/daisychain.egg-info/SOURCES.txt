@@ -1,4 +1,4 @@
-setup.py
+pyproject.toml
 daisychain/__init__.py
 daisychain/fusion.py
 daisychain/remote.py
@@ -6,4 +6,11 @@ daisychain/resolve.py
 daisychain.egg-info/PKG-INFO
 daisychain.egg-info/SOURCES.txt
 daisychain.egg-info/dependency_links.txt
+daisychain.egg-info/entry_points.txt
+daisychain.egg-info/requires.txt
 daisychain.egg-info/top_level.txt
+daisychain/scripts/__init__.py
+daisychain/scripts/bindive.py
+daisychain/scripts/collate.py
+daisychain/scripts/copycat.py
+daisychain/scripts/credits.py

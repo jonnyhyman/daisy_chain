@@ -1,3 +1,13 @@
 Metadata-Version: 2.1
 Name: daisychain
-Version: 0.1
+Version: 0.2.0
+Summary: DaVinci Resolve RPC & helpful editing scripts
+Author-email: Jonny Hyman <jonnyhyman@gmail.com>
+Project-URL: Homepage, https://github.com/jonnyhyman/daisy_chain
+Project-URL: Bug Tracker, https://github.com/jonnyhyman/daisy_chain/issues
+Requires-Python: >=3.9
+Description-Content-Type: text/markdown
+Requires-Dist: unsync
+Requires-Dist: watchfiles
+Requires-Dist: click
+Requires-Dist: pyperclip

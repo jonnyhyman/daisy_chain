@@ -1,0 +1,4 @@
+unsync
+watchfiles
+click
+pyperclip

@@ -1,0 +1,17 @@
+[project]
+name = "daisychain"
+version = "0.2.0"
+authors = [{name="Jonny Hyman", email="jonnyhyman@gmail.com" }]
+description = "DaVinci Resolve RPC & helpful editing scripts"
+readme = "README.md"
+dependencies = ["unsync", "watchfiles", "click", "pyperclip"]
+requires-python = ">=3.9"
+
+[project.scripts]
+bindive = "daisychain.scripts.bindive:main"
+copycat = "daisychain.scripts.copycat:main"
+collate = "daisychain.scripts.collate:main"
+
+[project.urls]
+"Homepage" = "https://github.com/jonnyhyman/daisy_chain"
+"Bug Tracker" = "https://github.com/jonnyhyman/daisy_chain/issues"
