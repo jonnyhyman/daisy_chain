@@ -1,11 +1,11 @@
 """
 
-    🐈 Copy Cat copies whatever the metadata
-        field says on the current TimelineItem
-        (and its MediaPoolItem) to the Clipboard!
+🐈 Copy Cat copies whatever the metadata
+    field says on the current TimelineItem
+    (and its MediaPoolItem) to the Clipboard!
 
-    Requires:
-    `pip install pyperclip`
+Requires:
+`pip install pyperclip`
 
 """
 
@@ -14,14 +14,15 @@ from time import sleep
 import pyperclip
 import click
 
-@click.command()
-@click.argument(
-        "interval", 
-        type=click.FloatRange(1.0/60.0, 60), 
-        help="Seconds between copying to clipboard"
-)
-def main(interval: float):
 
+@click.command()
+@click.option(
+    "--interval",
+    type=click.FloatRange(1.0 / 60.0, 60),
+    default=1.0,
+    help="Seconds between copying to clipboard",
+)
+def main(interval: float = 1.0):
     resolve = get_resolve()
     proj = resolve.get_project_manager().get_current_project()
 

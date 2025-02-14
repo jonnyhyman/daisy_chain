@@ -6,6 +6,14 @@ from the target watch folder into
 A) the currently open media bin
 B) the media bin specified
 
+NOTE: This is a toy example to get
+your imagination going, if you want
+to do auto-import more robustly, use
+the `bindive` script included in the
+daisy_chain installation scripts, eg.
+`bindive --watch ~/Downloads/`
+to import new files into Downloads
+
 Requires:
     `pip install watchfiles`
 """
@@ -32,11 +40,7 @@ resolve_importables = [
 use_initial_bin = False
 # ^ if True, will always import into the bin that current at script start
 # ^ if False, will always import into current bin, no matter where it is
-watch_dir = Path(
-    # "/Users/jonnyhyman/Dropbox/Dr Becky/Night Sky News/April 2024/B-ROLL/SCREEN GRABS/"
-    # "C:/Users/jonny/Dropbox/Dr Becky/Night Sky News/April 2024/B-ROLL/SCREEN GRABS/"
-    "/Users/jonnyhyman/Dropbox/Dr Becky/Night Sky News/May 2024/B-ROLL/screen captures/"
-)
+watch_dir = Path("/path/to/your/dir/")
 
 print(f"> Listening for changes in {watch_dir}")
 

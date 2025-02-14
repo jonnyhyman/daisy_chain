@@ -3,14 +3,15 @@ __Script and workflow manager for DaVinci Resolve__
 
 
 ## Goals
-- _Make DaVinci Resolve/Fusion scripting fast, fun, and reliable_
-- _Write scripts with full autocompletion, and in-IDE documentation_
+- _Make DaVinci Resolve/Fusion scripting better: faster, less tedious, and reliable_
+- _Write scripts with full autocompletion, and in-IDE documentation/hover-docs_
 - _Turn your one-off script automations into ongoing organized workflows_
-- _Experiment with Resolve scripts safely, on an unbounded undo tree_
-- _Share your workflows and use those that others have shared_
+- _Experiment with Resolve scripts safely, on an unbounded undo tree_ (Future goal, not currently implemented)
+- _Share your workflows and use those that others have shared_ (A script manager, not currently implemented)
 
 ## Status
-Experimental ⚠️ (Use caution, most script executions are irreversible!)
+Alpha, but used in production 🤞 
+(warning: Resolve script executions are irreversible!)
 
 |Language|Resolve API|Fusion API|Tests|
 |--|--|--|--|
@@ -19,7 +20,24 @@ Experimental ⚠️ (Use caution, most script executions are irreversible!)
 |JS/TS| ❌ | ❌ | ❌ |
 |Rust| ❌ | ❌ | ❌ |
 
-## Why?
+## Batteries included 🔋
+
+Any of these can be run on your commandline as soon as you've installed daisychain and started the Host.
+- `copycat` A script to copy from a current-timeline-item metadata field to clipboard on a timer, called CopyCat
+- `bindive` A script to auto-import anything added to a watch folder into current media bin `bindive --watch /path/to/watch`
+- `collate` A script to (recursively!) copy or move all media files on disk into a central location, mirroring Media Bin structure
+
+see the implementations in `python/daisychain/scripts/` for more details
+
+## Script ideas 💭
+
+- 🚧 A Chromium / WebKit extension to "Download to Media Pool" from internet, called CreditsDue
+- 🚧 A more accurate transcription workflow than Resolve's trashy one, using OpenAI Whisper
+- 🚧 `py-auto-gui` madness to automate repetitive edit tasks (vim-macros, basically)
+- 🚧 Removing silence from a clip automatically (via ffmpeg or some loopback)
+
+
+## Why? 🤔
 Blackmagic's API for Resolve and Fusion is extensive and powerful,
 but woefully undocumented and behind-the-times architecturally.
 From locking users into antiquated Python versions, to non-existent
@@ -33,34 +51,26 @@ while retaining full in-editor documentation stubs and types.
 
 It does this by hosting a remote procedure call server within Resolve,
 and defining a serialized interface for the entire API surface.
-(The Resolve API itself is actually an RPC server, so this is really
+The Resolve API itself is actually an RPC server, so this is really
 like an RPC of an RPC. While a little bit ridiculous, this allows us
-to write and use the API in a familiar way with full documentation)
+to write and use the API in an efficient way with full documentation!
 
 Types, documentation, and RPC connection is written in each client language,
 see the status of your favorite language in the Status table above.
 
-## Script use-cases
-
-- 🚧 A Chromium / WebKit extension to "Download to Media Pool" from internet, called CreditsDue
-- 🚧 A script to copy from a current-timeline-item metadata field to clipboard on a timer, called CopyCat
-- 🚧 A more accurate transcription workflow than Resolve's trashy one, using OpenAI Whisper
-- 🚧 Removing silence from a clip automatically (via ffmpeg or some loopback)
-- 🚧 `py-auto-gui` madness to automate repetitive edit tasks (macros, basically)
-
 ## Audience
-- Jonny mostly, for now
-- Later, lazy video editors with coding experience
-- Later, production houses with workflow programmers on staff
+- Lazy video editors with coding experience
+- Production houses with workflow programmers
 
 ## Installation
 
-1. Set Resolve External Scripting to Local or Network
+0. Download this repo
+1. Set Resolve External Scripting to *either* Local or Network
 2. Install Python
-2. Ensure that the PYTHONHOME env variable is set at system level,
+3. Ensure that the PYTHONHOME env variable is set at system level,
     to point to the directory where you will find the python3.exe,
     or symlink that path with /usr/local/bin/python3
-2. Copy the DaisyChain Host script into Resolve's watch folder for scripts
+4. Copy the DaisyChain Host script into Resolve's watch folder for scripts
     macOS
 
     ```
@@ -73,17 +83,16 @@ see the status of your favorite language in the Status table above.
     Linux
     📁 "~/.local/share/DaVinciResolve/Fusion/Scripts/Utility"
 
-3. Open 
-
-4. Close and open Resolve if it was open
-
+    Restart Resolve if it was open
+5. Run the DaisyChain host from the `Workspaces > Scripts` dropdown in Resolve
+6. Install daisychain to python by running `pip install -e .` (editable install) in the repo
 
 ## Roadmap
 
 __Milestone 1__ Python server and client
 - [x] Python RPC Server
 - [x] Python RPC client with Resolve API coverage, types, and docstrings
-- [ ] Python RPC client with Fusion API coverage, types, and docstrings
+- [ ] Python RPC client with Fusion API coverage, types, and docstrings < This would be awesome because you could run Fusion scripts from the Edit view, potentially game changing in some workflows
 
 __Milestone 2__ multi-language
 - [ ] JS RPC client with API coverage, types, and documentation

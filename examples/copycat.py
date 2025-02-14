@@ -1,11 +1,14 @@
 """
 
-    🐈 Copy Cat copies whatever the metadata
-        field says on the current TimelineItem
-        (and its MediaPoolItem) to the Clipboard!
+🐈 Copy Cat copies whatever the metadata
+    field says on the current TimelineItem
+    (and its MediaPoolItem) to the Clipboard!
 
-    Requires:
-    `pip install pyperclip`
+This example is more conveniently used via the
+daisychain included command line script 'copycat'
+
+Requires:
+`pip install pyperclip`
 
 """
 
@@ -25,7 +28,6 @@ while True:
     timeline = proj.get_current_timeline()
     item_clip = timeline.get_current_video_item()
 
-    # TODO: error occurs if item_clip is None, see #5
     if item_clip is not None:
         item_in_pool = item_clip.get_media_pool_item()
 
@@ -36,7 +38,5 @@ while True:
             if value != "":
                 pyperclip.copy(value)
                 print(f"🐈 MEOW `{value}`")
-
-    # TODO: pause mechanism (perhaps a TUI?)
 
     sleep(copy_intvl)
